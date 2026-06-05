@@ -92,29 +92,36 @@ fun ReceiptPreviewScreen(
 
                 is ReceiptElement.Barcode -> {
 
-                    Text(
-                        text = "[BARCODE]",
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        fontFamily = FontFamily.Monospace
-                    )
+                    BarcodeVisualizer.generate(element.value)?.let { bitmap ->
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "Barcode",
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp)
+                        )
+                    }
 
                     Text(
                         text = element.value,
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.Center,
-                        fontFamily = FontFamily.Monospace
+                        fontFamily = FontFamily.Monospace,
+                        fontSize = 12.sp
                     )
                 }
 
                 is ReceiptElement.QrCode -> {
 
-                    Text(
-                        text = "[QR CODE]",
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        fontFamily = FontFamily.Monospace
-                    )
+                    QrCodeVisualizer.generate(element.value)?.let { bitmap ->
+                        Image(
+                            bitmap = bitmap.asImageBitmap(),
+                            contentDescription = "QR Code",
+                            modifier = Modifier
+                                .align(Alignment.CenterHorizontally)
+                                .padding(vertical = 4.dp)
+                        )
+                    }
 
                     Text(
                         text = element.value,

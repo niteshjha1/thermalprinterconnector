@@ -50,4 +50,5 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation("com.github.felHR85:UsbSerial:6.1.0")
+    implementation(libs.zxing.core)
 }
