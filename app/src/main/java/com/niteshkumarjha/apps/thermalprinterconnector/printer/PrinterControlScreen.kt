@@ -27,7 +27,7 @@ fun PrinterControlScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text("Pointex Saga Printer Tester")
+                    Text("Thermal Printer Connector")
                 }
             )
         }

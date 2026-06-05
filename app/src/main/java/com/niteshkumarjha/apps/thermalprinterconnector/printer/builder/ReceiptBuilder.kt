@@ -128,7 +128,6 @@ class ReceiptBuilder(
         // QR
         receipt.elements.add(
             ReceiptElement.QrCode(
-                //Removed pointex domain reference
                 value = "https://mithilarestaurant.com"
             )
         )
