@@ -4,6 +4,13 @@ An Android library and sample application for seamless integration with ESC/POS 
 
 ---
 
+## Preview
+| Receipt Header | Barcode & QR Code Rendering |
+| :---: | :---: |
+| ![Header](screenshots/Screenshot_20260605_205738.png) | ![Footer](screenshots/Screenshot_20260605_205823.png) |
+
+---
+
 ## Overall Objective
 The goal of this project is to simplify the complex process of communicating with thermal receipt printers. Instead of manually handling byte arrays and ESC/POS hex codes, developers can define a receipt as a collection of high-level elements (Text, Images, Barcodes). The system then automatically translates these elements into the specific low-level commands required by the printer hardware and handles the underlying transport logic (finding USB devices or opening Network sockets).
 
