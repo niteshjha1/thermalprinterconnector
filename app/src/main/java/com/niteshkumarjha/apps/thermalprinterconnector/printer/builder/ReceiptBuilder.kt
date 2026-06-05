@@ -9,12 +9,21 @@ import com.niteshkumarjha.apps.thermalprinterconnector.printer.model.ReceiptElem
 import com.niteshkumarjha.apps.thermalprinterconnector.printer.model.ReceiptStyle
 import com.niteshkumarjha.apps.thermalprinterconnector.printer.model.ReceiptAlignment
 
+/**
+ * Builder class to construct a structured [ReceiptDocument].
+ * Provides a high-level API to define receipt layout without worrying about raw bytes.
+ */
 class ReceiptBuilder(
     private val context: Context
 ) {
     private val TAG = "ReceiptBuilder"
 
-
+    /**
+     * Constructs a sample receipt for testing purposes.
+     * Demonstrates use of logos, headers, itemized tables, totals, barcodes, and QR codes.
+     *
+     * @return A [ReceiptDocument] ready for preview or printing.
+     */
     fun buildTestReceipt(): ReceiptDocument {
         val receipt = ReceiptDocument()
 
@@ -30,7 +39,6 @@ class ReceiptBuilder(
         // Header
         receipt.elements.add(
             ReceiptElement.Text(
-                // CHANGED: Restyled to Mithila Restaurant
                 value = "MITHILA RESTAURANT",
                 style = ReceiptStyle(
                     bold = true,
@@ -42,21 +50,18 @@ class ReceiptBuilder(
 
         receipt.elements.add(
             ReceiptElement.Text(
-                // CHANGED: Restyled address to an Indian context
                 value = "Plot 18, Commercial Belt, Alpha 1"
             )
         )
 
         receipt.elements.add(
             ReceiptElement.Text(
-                // CHANGED: Restyled address to an Indian context
                 value = "Greater Noida, UP"
             )
         )
 
         receipt.elements.add(
             ReceiptElement.Text(
-                // CHANGED: Restyled contact phone number
                 value = "Tel: 0120 456 7890"
             )
         )
@@ -85,7 +90,7 @@ class ReceiptBuilder(
         receipt.elements.add(ReceiptElement.Text(value = "--------------------------------"))
 
         // Items
-        // CHANGED: Swapped items for authentic Indian and Mithila dishes with updated pricing
+        // Swapped items for authentic Indian and Mithila dishes with updated pricing
         receipt.elements.add(ReceiptElement.Text("Chicken Biryani x2     Rs 650.00"))
         receipt.elements.add(ReceiptElement.Text("Paneer Tikka x1        Rs 320.00"))
         receipt.elements.add(ReceiptElement.Text("Daal Makhani x2        Rs 400.00"))
@@ -102,7 +107,7 @@ class ReceiptBuilder(
         // Totals
         receipt.elements.add(
             ReceiptElement.Text(
-                // CHANGED: Adjusted total to match item sum calculations
+                // Adjusted total to match item sum calculations
                 value = "TOTAL : Rs 2740.00",
                 style = ReceiptStyle(
                     bold = true,
@@ -123,7 +128,7 @@ class ReceiptBuilder(
         // QR
         receipt.elements.add(
             ReceiptElement.QrCode(
-                // CHANGED: Removed pointex domain reference
+                //Removed pointex domain reference
                 value = "https://mithilarestaurant.com"
             )
         )
@@ -155,6 +160,10 @@ class ReceiptBuilder(
         return receipt
     }
 
+    /**
+     * Loads and scales the logo from resources.
+     * Ensures the bitmap fits within the printer's maximum printable width.
+     */
     private fun loadLogo(): Bitmap? {
         val resId = context.resources.getIdentifier("logo", "drawable", context.packageName)
         if (resId == 0) {

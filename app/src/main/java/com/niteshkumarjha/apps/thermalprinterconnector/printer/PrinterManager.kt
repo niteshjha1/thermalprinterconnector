@@ -11,11 +11,32 @@ private const val MAX_RECEIPT_PAYLOAD_SIZE = 64 * 1024
 private const val MAX_LOGO_WIDTH = 576
 private const val MAX_FEED_LINES = 5
 
+/**
+ * Main manager responsible for orchestrating the printing process.
+ * It validates the receipt document, converts it to ESC/POS commands,
+ * and handles the underlying transport communication.
+ *
+ * @property transport The hardware communication layer (USB or Network).
+ * @property escPosCommandBuilder The builder that converts high-level models to raw bytes.
+ */
 class PrinterManager(
     private val transport: PrinterTransport,
     private val escPosCommandBuilder: EscPosCommandBuilder
 ) {
 
+    /**
+     * Executes the printing process for the given [receiptDocument].
+     *
+     * Steps:
+     * 1. Validates individual elements (image width, content length).
+     * 2. Builds the raw ESC/POS payload.
+     * 3. Checks payload size against hardware limits.
+     * 4. Establishes transport connection.
+     * 5. Writes payload and disconnects.
+     *
+     * @param receiptDocument The structured receipt data to print.
+     * @throws IllegalArgumentException if validation fails or payload exceeds limits.
+     */
     fun print(receiptDocument: ReceiptDocument) {
 
         validateDocument(receiptDocument)
@@ -45,7 +66,10 @@ class PrinterManager(
         }
     }
 
-    // Validate receipt before building ESC/POS payload
+    /**
+     * Validates receipt elements before conversion to prevent mid-print hardware errors.
+     * Checks for maximum image widths, barcode lengths, and excessive paper feeds.
+     */
     private fun validateDocument(document: ReceiptDocument) {
 
         document.elements.forEachIndexed { index, element ->

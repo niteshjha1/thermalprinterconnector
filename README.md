@@ -9,31 +9,41 @@ The goal of this project is to simplify the complex process of communicating wit
 
 ---
 
+## Printing Flow Execution
+1.  **Define Content**: Use `ReceiptBuilder` to create a `ReceiptDocument` containing elements like `Text`, `Image`, `Barcode`, or `QrCode`.
+2.  **Preview**: (Optional) Use `ReceiptPreviewScreen` to render a visual representation of the receipt in the UI.
+3.  **Command Generation**: `PrinterManager` uses `EscPosCommandBuilder` to iterate through the document and translate high-level elements into raw ESC/POS byte sequences.
+4.  **Hardware Handshake**: `PrinterManager` triggers the selected `PrinterTransport` (USB or Socket) to establish a connection.
+5.  **Data Transmission**: The raw bytes are streamed to the hardware via bulk transfer (USB) or output streams (Socket).
+6.  **Completion**: The printer executes commands (print, feed, cut), and the transport is disconnected.
+
+---
+
 ## Detailed Class Breakdown
 
 ### 1. Core Logic & Management
-*   **`PrinterManager`**: The "brain" of the operation. It orchestrates the entire printing flow. It validates the `ReceiptDocument`, uses the `EscPosCommandBuilder` to generate the raw bytes, and uses a `PrinterTransport` to send the data to the hardware.
-*   **`ReceiptBuilder`**: A helper class used to construct a `ReceiptDocument`. It provides a structured way to add headers, logos, itemized lists, totals, and footers with specific styling.
+*   **`PrinterManager`**: The "brain" of the operation. Orchestrates validation, command building, and transport execution. Handles safety checks like payload size limits.
+*   **`ReceiptBuilder`**: A high-level builder class that allows constructing complex receipts using a simple, readable API.
 
 ### 2. Models (The "What" to Print)
-*   **`ReceiptDocument`**: A data container holding a list of `ReceiptElement`s. It represents the complete structure of a single receipt.
-*   **`ReceiptElement`**: A sealed class representing different types of content:
-    *   `Text`: Includes string value and `ReceiptStyle`.
-    *   `Image`: Holds a Bitmap to be converted to monochrome bit-image commands.
-    *   `Barcode` / `QrCode`: Holds data to be rendered as scannable codes.
-    *   `Feed`: Instructs the printer to move the paper forward.
-*   **`ReceiptStyle` / `ReceiptAlignment`**: Define formatting options like **bold**, *underline*, double-height/width, and Left/Center/Right alignment.
+*   **`ReceiptDocument`**: The primary data structure containing a list of `ReceiptElement`s.
+*   **`ReceiptElement`**: A sealed class hierarchy representing printable components:
+    *   `Text`: Supports alignment, bolding, underlining, and double-size scaling.
+    *   `Image`: Supports monochrome bit-image printing from standard bitmaps.
+    *   `Barcode` / `QrCode`: Generates printer-native scannable codes.
+    *   `Feed`: Directs paper movement.
+*   **`ReceiptStyle` / `ReceiptAlignment`**: Enumerations and data classes for controlling text layout and typography.
 
 ### 3. ESC/POS Generation (The "Translator")
-*   **`EscPosCommandBuilder`**: Iterates through a `ReceiptDocument` and converts each element into a stream of ESC/POS bytes.
-*   **`EscPosImageHelper`**: Contains the logic to convert a standard Android `Bitmap` into the specific 1-bit monochrome format required by thermal printers.
-*   **`EscPosBarcodeGenerator` / `EscPosQrGenerator`**: Specialized helpers for generating the specific command sequences for scannable codes.
+*   **`EscPosCommandBuilder`**: The protocol implementation. Converts high-level models into the raw hex commands understood by the printer hardware.
+*   **`EscPosImageHelper`**: Specialized logic to convert Android `Bitmap`s into the specific 1-bit vertical-bit-mapping format used by ESC/POS commands.
+*   **`EscPosBarcodeGenerator` / `EscPosQrGenerator`**: Helpers for formatting data into standardized barcode and QR code byte sequences.
 
 ### 4. Transports (The "How" to Send)
-*   **`PrinterTransport` (Interface)**: Defines a common contract for connecting, writing data, and disconnecting.
-*   **`UsbPrinterTransport`**: Handles Android USB Host API interactions. It discovers connected USB printers and performs data transfers to the printer's endpoint.
-*   **`SocketPrinterTransport`**: Handles Network printing via TCP/IP. It opens a socket to the printer's IP (usually on port 9100) and streams the data.
+*   **`PrinterTransport` (Interface)**: The abstraction layer for hardware communication.
+*   **`UsbPrinterTransport`**: Implements USB Host communication, handling device discovery, permissions, and bulk transfers.
+*   **`SocketPrinterTransport`**: Implements TCP/IP communication for network printers (typically on port 9100).
 
 ### 5. UI Components
-*   **`ReceiptPreviewScreen`**: A Jetpack Compose implementation that renders a visual "mock" of how the receipt will look on paper before it is actually printed.
-*   **`PrinterControlScreen`**: The main interface for the user to select connection modes (USB vs. IP), enter IP addresses, and trigger the print action.
+*   **`ReceiptPreviewScreen`**: A Compose-based viewer that mimics the final printed result, allowing users to verify content before physical printing.
+*   **`PrinterControlScreen`**: The main user interface for configuring printer connections and triggering test prints.

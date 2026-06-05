@@ -5,6 +5,10 @@ import com.niteshkumarjha.apps.thermalprinterconnector.printer.model.ReceiptElem
 import java.io.ByteArrayOutputStream
 import com.niteshkumarjha.apps.thermalprinterconnector.printer.model.ReceiptAlignment
 
+/**
+ * Translates [ReceiptDocument] elements into raw ESC/POS byte commands.
+ * This class implements the core protocol logic used by most thermal printers.
+ */
 class EscPosCommandBuilder(
     private val imageHelper: EscPosImageHelper,
     private val barcodeGenerator: EscPosBarcodeGenerator,
@@ -14,30 +18,45 @@ class EscPosCommandBuilder(
     private val ESC = 0x1B.toByte()
     private val GS = 0x1D.toByte()
 
+    /** Initializes printer to default state. */
     private fun initPrinter() = byteArrayOf(ESC, 0x40)
 
+    /** Sets text alignment to Left. */
     private fun alignLeft() = byteArrayOf(ESC, 0x61, 0x00)
 
+    /** Sets text alignment to Center. */
     private fun alignCenter() = byteArrayOf(ESC, 0x61, 0x01)
 
+    /** Sets text alignment to Right. */
     private fun alignRight() = byteArrayOf(ESC, 0x61, 0x02)
 
+    /** Enables bold mode. */
     private fun boldOn() = byteArrayOf(ESC, 0x45, 0x01)
 
+    /** Disables bold mode. */
     private fun boldOff() = byteArrayOf(ESC, 0x45, 0x00)
 
+    /** Enables underline. */
     private fun underlineOn() = byteArrayOf(ESC, 0x2D, 0x01)
 
+    /** Disables underline. */
     private fun underlineOff() = byteArrayOf(ESC, 0x2D, 0x00)
 
+    /** Enables double-width and double-height text. */
     private fun doubleSizeOn() = byteArrayOf(GS, 0x21, 0x11)
 
+    /** Disables double-size text. */
     private fun doubleSizeOff() = byteArrayOf(GS, 0x21, 0x00)
 
+    /** Triggers the automatic paper cutter. */
     private fun cutPaper() = byteArrayOf(GS, 0x56, 0x00)
 
+    /** Feeds paper by [lines] amount. */
     private fun feedLines(lines: Int) = byteArrayOf(ESC, 0x64, lines.toByte())
 
+    /**
+     * Converts a [ReceiptDocument] into a single [ByteArray] of ESC/POS commands.
+     */
     fun build(document: ReceiptDocument): ByteArray {
 
         val stream = ByteArrayOutputStream()
